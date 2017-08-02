@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe Spree::Order, type: :model do
+describe Spree::Order, :vcr do
 
   let(:order) {FactoryBot.create(:order_with_line_items)}
   let(:avalara_order) { create(:completed_order_with_totals) }

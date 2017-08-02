@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe Spree::Refund, type: :model do
+describe Spree::Refund, :vcr do
 
   subject(:order) do
     order = create(:shipped_order)
@@ -79,7 +79,7 @@ describe Spree::Refund, type: :model do
     end
 
     it 'returns correct TotalTax' do
-      expect(subject['TotalTax'].to_f.abs).to eq(order.additional_tax_total)
+      expect(subject['TotalTax'].to_f.abs).to eq(order.additional_tax_total.to_f)
     end
   end
 end
