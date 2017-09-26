@@ -68,7 +68,8 @@ module Spree
       "avtx_#{short_key}"
     end
 
-    alias_method_chain :cache_key, :short_hash
+    alias_method :cache_key_without_short_hash, :cache_key
+    alias_method :cache_key, :cache_key_with_short_hash
 
     def retrieve_rates_from_cache(order)
       Rails.cache.fetch(cache_key(order), time_to_idle: 5.minutes) do

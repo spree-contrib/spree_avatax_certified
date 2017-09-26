@@ -3,6 +3,7 @@ FactoryGirl.define do
     zones { |a| [Spree::Zone.find_by(name: 'GlobalZone') || create(:zone, :with_country, default_tax: true)] }
     name 'Avalara Ground'
     code 'Avalara_Ground'
+    display_on 'both'
     association(:calculator, factory: :shipping_calculator, strategy: :create)
 
     transient do

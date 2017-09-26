@@ -4,12 +4,12 @@ RSpec.describe Spree::Admin::AvataxSettingsController, type: :controller do
   stub_authorization!
 
   describe "/avatax_settings" do
-    subject { spree_get :show }
+    subject { get :show }
     it { should be_success }
   end
 
   describe "/avatax_settings/edit" do
-    subject { spree_get :edit }
+    subject { get :edit }
     it { should be_success }
   end
 
@@ -17,7 +17,7 @@ RSpec.describe Spree::Admin::AvataxSettingsController, type: :controller do
     before { File.new("#{Rails.root}/log/avatax.log", 'w') }
     after { File.delete("#{Rails.root}/log/avatax.log") }
 
-    subject { spree_get :download_avatax_log }
+    subject { get :download_avatax_log }
     it { should be_success }
   end
 
@@ -28,7 +28,7 @@ RSpec.describe Spree::Admin::AvataxSettingsController, type: :controller do
 
       expect(File.read('log/avatax.log')).to eq('Hyah!')
 
-      spree_get :erase_data
+      get :erase_data
 
       expect(File.read('log/avatax.log')).to eq('')
     end
@@ -36,7 +36,7 @@ RSpec.describe Spree::Admin::AvataxSettingsController, type: :controller do
 
   describe '/avatax_settings/ping_my_service' do
     it 'flashes message' do
-      subject { spree_get :ping_my_service }
+      subject { get :ping_my_service }
       response.should be_success
       flash.should_not be_nil
     end
@@ -54,7 +54,7 @@ RSpec.describe Spree::Admin::AvataxSettingsController, type: :controller do
       }
     end
 
-    subject { spree_put :update, params }
+    subject { put :update, params: params }
 
     it { is_expected.to redirect_to(spree.admin_avatax_settings_path) }
   end
