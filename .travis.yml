@@ -21,6 +21,7 @@ env:
 language: ruby
 
 rvm:
+  - 2.4.2
   - 2.3.1
   - 2.2.7
 
@@ -28,6 +29,7 @@ gemfile:
   - gemfiles/spree_3_1.gemfile
   - gemfiles/spree_3_2.gemfile
   - gemfiles/spree_3_3.gemfile
+  - gemfiles/spree_3_4.gemfile
   - gemfiles/spree_master.gemfile
 
 before_install:
