@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe Spree::Order, type: :model do
 
-  let(:order) {FactoryGirl.create(:order_with_line_items)}
+  let(:order) {FactoryBot.create(:order_with_line_items)}
   let(:avalara_order) { create(:completed_order_with_totals) }
   let(:variant) { create(:variant) }
 

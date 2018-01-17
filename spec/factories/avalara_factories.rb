@@ -1,4 +1,4 @@
-FactoryGirl.define do
+FactoryBot.define do
   factory :request_hash, class: Hash do
     Commit false
     CustomerCode '1'
@@ -20,7 +20,7 @@ FactoryGirl.define do
   end
 end
 
-FactoryGirl.modify do
+FactoryBot.modify do
   factory :tax_category, class: Spree::TaxCategory do
     name { "TaxCategory - #{rand(999999)}" }
     tax_code { 'PC030000' }
