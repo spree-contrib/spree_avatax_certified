@@ -5,7 +5,7 @@ Gem::Specification.new do |s|
   s.version     = '3.3.0'
   s.summary     = 'Spree extension for Avalara tax calculation.'
   s.description = 'Spree extension for Avalara tax calculation.'
-  s.required_ruby_version = '>= 2.1.0'
+  s.required_ruby_version = '>= 2.2.7'
 
   s.author    = 'Allison Reilly'
   s.email     = 'acreilly3@gmail.com'
