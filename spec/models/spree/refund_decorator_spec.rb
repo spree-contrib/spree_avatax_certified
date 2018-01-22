@@ -65,7 +65,7 @@ describe Spree::Refund, type: :model do
   end
 
 
-  context 'full refund', :vcr do
+  context 'full refund', vcr: { cassette_name: 'Spree_Refund/full_refund/returns_correct_tax_calculations' } do
     let(:order) { create(:completed_avalara_order, shipment_cost: 10) }
     let(:refund) { build(:refund, payment: order.payments.first, amount: order.total.to_f) }
 
@@ -74,8 +74,11 @@ describe Spree::Refund, type: :model do
       refund.avalara_capture_finalize
     end
 
-    it 'returns correct tax calculations' do
+    it 'returns correct TotalAmount' do
       expect(subject['TotalAmount'].to_f.abs).to eq(order.total - order.additional_tax_total)
+    end
+
+    it 'returns correct TotalTax' do
       expect(subject['TotalTax'].to_f.abs).to eq(order.additional_tax_total)
     end
   end
