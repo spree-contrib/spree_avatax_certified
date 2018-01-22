@@ -17,7 +17,6 @@ require 'dotenv'
 Dotenv.load
 
 require 'rspec/rails'
-require 'database_cleaner'
 require 'ffaker'
 require 'shoulda/matchers'
 
@@ -42,18 +41,4 @@ RSpec.configure do |config|
   config.use_transactional_fixtures = false
 
   config.infer_spec_type_from_file_location!
-
-  config.before :suite do
-    DatabaseCleaner.strategy = :transaction
-    DatabaseCleaner.clean_with :truncation
-  end
-
-  config.before :each do
-    DatabaseCleaner.start
-    MyConfigPreferences.set_preferences
-  end
-
-  config.after :each do
-    DatabaseCleaner.clean
-  end
 end
