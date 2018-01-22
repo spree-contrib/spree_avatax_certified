@@ -1,4 +1,4 @@
-FactoryGirl.define do
+FactoryBot.define do
   factory :avalara_order, class: Spree::Order do
     user
     bill_address
@@ -35,7 +35,11 @@ FactoryGirl.define do
     end
 
     after(:create) do |order, evaluator|
-      create_list(:line_item, evaluator.line_items_count, order: order, price: evaluator.line_items_price, tax_category: evaluator.tax_category, quantity: evaluator.line_items_quantity)
+      create_list(:line_item, evaluator.line_items_count,
+                  order: order,
+                  price: evaluator.line_items_price,
+                  tax_category: evaluator.tax_category || Spree::TaxCategory.first,
+                  quantity: evaluator.line_items_quantity)
       order.line_items.reload
 
       create(:avalara_shipment, order: order, cost: evaluator.shipment_cost, tax_included: evaluator.tax_included)

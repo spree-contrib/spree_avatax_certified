@@ -113,13 +113,31 @@ describe SpreeAvataxCertified::Address, :type => :model do
   end
 
   describe '#validate' do
-    subject do
-      VCR.use_cassette('address_validation_success', allow_playback_repeats: true) do
-        address_lines.validate
+    context 'on success' do
+      subject do
+        VCR.use_cassette('address_validation_success', allow_playback_repeats: true) do
+          address_lines.validate
+        end
+      end
+      it 'validates address with success' do
+        expect(subject['ResultCode']).to eq('Success')
       end
     end
-    it 'validates address with success' do
-      expect(subject['ResultCode']).to eq('Success')
+
+    context 'on failure' do
+      let(:address){ Spree::Address.new(country: create(:country)) }
+      let(:order) { build(:avalara_order, ship_address: address) }
+      let(:address_lines) { SpreeAvataxCertified::Address.new(order)  }
+
+      subject do
+        VCR.use_cassette('address_validation_failure', allow_playback_repeats: true) do
+          address_lines.validate
+        end
+      end
+
+      it 'validates address with error' do
+        expect(subject['ResultCode']).to eq('Error')
+      end
     end
 
     it 'does not validate when config settings are false' do
@@ -131,14 +149,15 @@ describe SpreeAvataxCertified::Address, :type => :model do
 
 
   describe 'multiple stock locations' do
-    let(:stock_loc_2) { create(:stock_location) }
-    let(:var1) {
+    let!(:stock_loc_1) { create(:stock_location) }
+    let!(:stock_loc_2) { create(:stock_location) }
+    let!(:var1) {
       variant = create(:variant)
       variant.stock_items.destroy_all
-      variant.stock_items.create(stock_location_id: Spree::StockLocation.first.id, backorderable: true)
+      variant.stock_items.create(stock_location_id: stock_loc_1.id, backorderable: true)
       variant
     }
-    let(:var2) {
+    let!(:var2) {
       variant = create(:variant)
       variant.stock_items.destroy_all
       variant.stock_items.create(stock_location_id: stock_loc_2.id, backorderable: true)
@@ -163,7 +182,7 @@ describe SpreeAvataxCertified::Address, :type => :model do
     it 'should have correct address codes' do
       address_lines = SpreeAvataxCertified::Address.new(order)
 
-      expect(address_lines.addresses.last[:AddressCode]).to eq(order.shipments.last.stock_location_id.to_s)
+      expect(address_lines.addresses.last[:AddressCode]).to eq(order.reload.shipments.last.stock_location_id.to_s)
     end
   end
 end
