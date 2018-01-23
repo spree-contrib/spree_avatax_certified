@@ -46,21 +46,6 @@ describe SpreeAvataxCertified::AvataxLog, :type => :model do
     end
   end
 
-  describe '#info_and_debug' do
-    it 'recieves info and debug messages' do
-      expect(logger.logger).to receive(:info).with('[AVATAX] Hyah!')
-      expect(logger.logger).to receive(:debug).with("[AVATAX] [\"Heuh!\"]")
-
-      logger.info_and_debug('Hyah!', ['Heuh!'])
-    end
-
-    it 'returns nil if logger is not enabled' do
-      Spree::Config.avatax_log = false
-
-      expect(logger.info_and_debug('Hyah!', ['Heuh!'])).to be_nil
-    end
-  end
-
   describe '#debug' do
     it 'receives debug with message' do
       expect(logger.logger).to receive(:debug).with("[AVATAX] Heuh #{request_hash}")
