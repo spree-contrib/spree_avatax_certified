@@ -36,3 +36,8 @@ gemfile:
 
 before_install:
   - mysql -u root -e "GRANT ALL ON *.* TO 'travis'@'%';"
+  - gem install spree -v '~> 3.1.0'
+  - gem install codeclimate-test-reporter
+  - gem install pry
+  - gem install rails-controller-testing
+  - gem install rails_test_params_backport
