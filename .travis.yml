@@ -1,7 +1,9 @@
 sudo: required
 dist: trusty
 
-before_script: "bundle install"
+install:
+  - bundle install --full-index --jobs=3 --retry=3
+
 script:
   - bundle exec rake test_app
   - bundle exec rake spec
