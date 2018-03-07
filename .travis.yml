@@ -1,9 +1,6 @@
 sudo: required
 dist: trusty
 
-install:
-  - bundle install --full-index --jobs=3 --retry=3
-
 script:
   - bundle exec rake test_app
   - bundle exec rake spec
@@ -23,9 +20,12 @@ env:
 language: ruby
 
 rvm:
-  - 2.4.2
   - 2.3.1
   - 2.2.7
+
+matrix:
+    allow_failures:
+          - gemfile: gemfiles/spree_master.gemfile
 
 gemfile:
   - gemfiles/spree_3_1.gemfile
@@ -36,8 +36,3 @@ gemfile:
 
 before_install:
   - mysql -u root -e "GRANT ALL ON *.* TO 'travis'@'%';"
-  - gem install spree -v '~> 3.1.0'
-  - gem install codeclimate-test-reporter
-  - gem install pry
-  - gem install rails-controller-testing
-  - gem install rails_test_params_backport
