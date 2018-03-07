@@ -10,6 +10,8 @@ class TaxSvc
   AVALARA_OPEN_TIMEOUT = ENV.fetch('AVALARA_OPEN_TIMEOUT', 2)
   AVALARA_READ_TIMEOUT = ENV.fetch('AVALARA_READ_TIMEOUT', 6)
   AVALARA_RETRY        = ENV.fetch('AVALARA_RETRY', 2)
+  ERRORS_TO_RETRY = [Timeout::Error, Errno::EINVAL, Errno::ECONNRESET, Errno::ECONNREFUSED, EOFError,
+                     Net::HTTPBadResponse, Net::HTTPHeaderSyntaxError, Net::ProtocolError].freeze
 
   def get_tax(request_hash)
     log(__method__, request_hash)
@@ -47,8 +49,7 @@ class TaxSvc
       res = http.get(uri.request_uri, 'Authorization' => credential, 'Content-Type' => 'application/json')
       JSON.parse(res.body)
     end
-  rescue Timeout::Error, Errno::EINVAL, Errno::ECONNRESET, EOFError,
-         Net::HTTPBadResponse, Net::HTTPHeaderSyntaxError, Net::ProtocolError => e
+  rescue *ERRORS_TO_RETRY => e
     retry unless (tries -= 1).zero?
     logger.error e, 'Estimate Tax Error'
     'Estimate Tax Error'
@@ -70,8 +71,7 @@ class TaxSvc
     request = http.get(uri.request_uri, 'Authorization' => credential)
     response = SpreeAvataxCertified::Response::AddressValidation.new(request.body)
     handle_response(response)
-  rescue Timeout::Error, Errno::EINVAL, Errno::ECONNRESET, EOFError,
-         Net::HTTPBadResponse, Net::HTTPHeaderSyntaxError, Net::ProtocolError => e
+  rescue *ERRORS_TO_RETRY => e
     retry unless (tries -= 1).zero?
     logger.error(e)
     SpreeAvataxCertified::Response::AddressValidation.new('{}')
@@ -137,9 +137,9 @@ class TaxSvc
     end
 
     JSON.parse(res)
-  rescue Timeout::Error, Errno::EINVAL, Errno::ECONNRESET, EOFError,
-         RestClient::ExceptionWithResponse, RestClient::ServerBrokeConnection,
-         RestClient::SSLCertificateNotVerified => e
+  rescue *ERRORS_TO_RETRY.concat([RestClient::ExceptionWithResponse,
+                                  RestClient::ServerBrokeConnection,
+                                  RestClient::SSLCertificateNotVerified]) => e
     retry unless (tries -= 1).zero?
     logger.error e, 'Avalara Request Error'
   end
