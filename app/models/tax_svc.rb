@@ -74,6 +74,7 @@ class TaxSvc
          Net::HTTPBadResponse, Net::HTTPHeaderSyntaxError, Net::ProtocolError => e
     retry unless (tries -= 1).zero?
     logger.error(e)
+    SpreeAvataxCertified::Response::AddressValidation.new('{}')
   end
 
   protected
