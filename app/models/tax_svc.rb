@@ -7,6 +7,10 @@ require 'logging'
 
 # Avatax tax calculation API calls
 class TaxSvc
+  AVALARA_OPEN_TIMEOUT = ENV.fetch('AVALARA_OPEN_TIMEOUT', 2)
+  AVALARA_READ_TIMEOUT = ENV.fetch('AVALARA_READ_TIMEOUT', 6)
+  AVALARA_RETRY        = ENV.fetch('AVALARA_RETRY', 2)
+
   def get_tax(request_hash)
     log(__method__, request_hash)
     RestClient.log = logger.logger
@@ -25,6 +29,7 @@ class TaxSvc
   end
 
   def estimate_tax(coordinates, sale_amount)
+    tries ||= AVALARA_RETRY
     if tax_calculation_enabled?
       log(__method__)
 
@@ -36,13 +41,15 @@ class TaxSvc
       http = Net::HTTP.new(uri.host, uri.port)
       http.use_ssl = true
       http.verify_mode = OpenSSL::SSL::VERIFY_NONE
-      http.open_timeout = 1
-      http.read_timeout = 1
+      http.open_timeout = AVALARA_OPEN_TIMEOUT
+      http.read_timeout = AVALARA_READ_TIMEOUT
 
       res = http.get(uri.request_uri, 'Authorization' => credential, 'Content-Type' => 'application/json')
       JSON.parse(res.body)
     end
-  rescue => e
+  rescue Timeout::Error, Errno::EINVAL, Errno::ECONNRESET, EOFError,
+         Net::HTTPBadResponse, Net::HTTPHeaderSyntaxError, Net::ProtocolError => e
+    retry unless (tries -= 1).zero?
     logger.error e, 'Estimate Tax Error'
     'Estimate Tax Error'
   end
@@ -58,12 +65,13 @@ class TaxSvc
     http = Net::HTTP.new(uri.host, uri.port)
     http.use_ssl = true
     http.verify_mode = OpenSSL::SSL::VERIFY_NONE
-    http.open_timeout = 1
-    http.read_timeout = 1
+    http.open_timeout = AVALARA_OPEN_TIMEOUT
+    http.read_timeout = AVALARA_READ_TIMEOUT
     request = http.get(uri.request_uri, 'Authorization' => credential)
     response = SpreeAvataxCertified::Response::AddressValidation.new(request.body)
     handle_response(response)
-  rescue => e
+  rescue Timeout::Error, Errno::EINVAL, Errno::ECONNRESET, EOFError,
+         Net::HTTPBadResponse, Net::HTTPHeaderSyntaxError, Net::ProtocolError => e
     retry unless (tries -= 1).zero?
     logger.error(e)
   end
@@ -73,12 +81,9 @@ class TaxSvc
   def handle_response(response)
     result = response.result
     begin
-      if response.error?
-        raise response.result
-      end
+      raise response.result if response.error?
 
       logger.debug(result, response.description + ' Response')
-
     rescue => e
       logger.error(e.message, response.description + ' Error')
     end
@@ -117,24 +122,29 @@ class TaxSvc
   end
 
   def request(uri, request_hash)
+    tries ||= AVALARA_RETRY
     res = RestClient::Request.execute(method: :post,
-                                timeout: 1,
-                                open_timeout: 1,
-                                url: service_url + uri,
-                                payload:  JSON.generate(request_hash),
-                                headers: {
-                                  authorization: credential,
-                                  content_type: 'application/json'
-                                }
-    )  do |response, request, result|
+                                      open_timeout: AVALARA_OPEN_TIMEOUT,
+                                      timeout: AVALARA_READ_TIMEOUT,
+                                      url: service_url + uri,
+                                      payload:  JSON.generate(request_hash),
+                                      headers: {
+                                        authorization: credential,
+                                        content_type: 'application/json'
+                                      }) do |response, _request, _result|
       response
     end
 
     JSON.parse(res)
+  rescue Timeout::Error, Errno::EINVAL, Errno::ECONNRESET, EOFError,
+         RestClient::ExceptionWithResponse, RestClient::ServerBrokeConnection,
+         RestClient::SSLCertificateNotVerified => e
+    retry unless (tries -= 1).zero?
+    logger.error e, 'Avalara Request Error'
   end
 
   def log(method, request_hash = nil)
     return if request_hash.nil?
-    logger.debug(request_hash, "#{method.to_s} request hash")
+    logger.debug(request_hash, "#{method} request hash")
   end
 end
