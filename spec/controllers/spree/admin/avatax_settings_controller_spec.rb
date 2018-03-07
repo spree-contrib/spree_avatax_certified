@@ -5,12 +5,12 @@ RSpec.describe Spree::Admin::AvataxSettingsController, type: :controller do
 
   describe "/avatax_settings" do
     subject { get :show }
-    it { should be_success }
+    it { is_expected.to be_success }
   end
 
   describe "/avatax_settings/edit" do
     subject { get :edit }
-    it { should be_success }
+    it { is_expected.to be_success }
   end
 
   describe '/avatax_settings/download_avatax_log' do
@@ -18,7 +18,8 @@ RSpec.describe Spree::Admin::AvataxSettingsController, type: :controller do
     after { File.delete("#{Rails.root}/log/avatax.log") }
 
     subject { get :download_avatax_log }
-    it { should be_success }
+
+    it { is_expected.to be_success }
   end
 
   describe '/avatax_settings/erase_data' do
@@ -37,8 +38,9 @@ RSpec.describe Spree::Admin::AvataxSettingsController, type: :controller do
   describe '/avatax_settings/ping_my_service' do
     it 'flashes message' do
       subject { get :ping_my_service }
-      response.should be_success
-      flash.should_not be_nil
+
+      expect(response).to be_success
+      expect(flash).not_to be_nil
     end
   end
 
