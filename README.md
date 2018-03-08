@@ -19,7 +19,7 @@ From Avalara's own explanation of the certification program:
 Installation
 ------------
 ```ruby
-gem 'spree_avatax_certified', github: 'boomerdigital/spree_avatax_certified', branch: 'master'
+gem 'spree_avatax_certified', github: 'spree-contrib/spree_avatax_certified', branch: 'master'
 ```
 ```shell
 bundle install
