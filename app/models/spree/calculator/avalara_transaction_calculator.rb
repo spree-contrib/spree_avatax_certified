@@ -40,7 +40,7 @@ module Spree
     end
 
     def get_avalara_response(order)
-      Rails.cache.fetch(cache_key(order), time_to_idle: 5.minutes) do
+      Rails.cache.fetch(cache_key(order)) do
         order.avalara_capture
       end
     end
@@ -72,7 +72,7 @@ module Spree
     alias_method :cache_key, :cache_key_with_short_hash
 
     def retrieve_rates_from_cache(order)
-      Rails.cache.fetch(cache_key(order), time_to_idle: 5.minutes) do
+      Rails.cache.fetch(cache_key(order)) do
         # this is the fallback value written to the cache if there is no value
         order.avalara_capture
       end
