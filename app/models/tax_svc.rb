@@ -137,9 +137,9 @@ class TaxSvc
     end
 
     JSON.parse(res)
-  rescue *ERRORS_TO_RETRY.concat([RestClient::ExceptionWithResponse,
-                                  RestClient::ServerBrokeConnection,
-                                  RestClient::SSLCertificateNotVerified]) => e
+  rescue *(ERRORS_TO_RETRY + [RestClient::ExceptionWithResponse,
+                              RestClient::ServerBrokeConnection,
+                              RestClient::SSLCertificateNotVerified]) => e
     retry unless (tries -= 1).zero?
     logger.error e, 'Avalara Request Error'
   end
