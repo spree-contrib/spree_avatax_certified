@@ -7,9 +7,9 @@ require 'logging'
 
 # Avatax tax calculation API calls
 class TaxSvc
-  AVALARA_OPEN_TIMEOUT = ENV.fetch('AVALARA_OPEN_TIMEOUT', 2)
-  AVALARA_READ_TIMEOUT = ENV.fetch('AVALARA_READ_TIMEOUT', 6)
-  AVALARA_RETRY        = ENV.fetch('AVALARA_RETRY', 2)
+  AVALARA_OPEN_TIMEOUT = ENV.fetch('AVALARA_OPEN_TIMEOUT', 2).to_i
+  AVALARA_READ_TIMEOUT = ENV.fetch('AVALARA_READ_TIMEOUT', 6).to_i
+  AVALARA_RETRY        = ENV.fetch('AVALARA_RETRY', 2).to_i
   ERRORS_TO_RETRY = [Timeout::Error, Errno::EINVAL, Errno::ECONNRESET, Errno::ECONNREFUSED, EOFError,
                      Net::HTTPBadResponse, Net::HTTPHeaderSyntaxError, Net::ProtocolError].freeze
 
