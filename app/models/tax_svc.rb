@@ -126,7 +126,7 @@ class TaxSvc
     tries ||= AVALARA_RETRY
     res = RestClient::Request.execute(method: :post,
                                       open_timeout: AVALARA_OPEN_TIMEOUT,
-                                      timeout: AVALARA_READ_TIMEOUT,
+                                      read_timeout: AVALARA_READ_TIMEOUT,
                                       url: service_url + uri,
                                       payload:  JSON.generate(request_hash),
                                       headers: {
