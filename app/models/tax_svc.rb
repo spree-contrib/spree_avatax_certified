@@ -7,6 +7,8 @@ require 'logging'
 
 # Avatax tax calculation API calls
 class TaxSvc
+  include ExceptionsHelper
+
   AVALARA_OPEN_TIMEOUT = ENV.fetch('AVALARA_OPEN_TIMEOUT', 2).to_i
   AVALARA_READ_TIMEOUT = ENV.fetch('AVALARA_READ_TIMEOUT', 6).to_i
   AVALARA_RETRY        = ENV.fetch('AVALARA_RETRY', 2).to_i
@@ -31,28 +33,29 @@ class TaxSvc
   end
 
   def estimate_tax(coordinates, sale_amount)
-    tries ||= AVALARA_RETRY
-    if tax_calculation_enabled?
-      log(__method__)
+    log(__method__, coordinates)
+    return unless tax_calculation_enabled? && coordinates
 
-      return nil if coordinates.nil?
-      sale_amount = 0 if sale_amount.nil?
-      coor = coordinates[:latitude].to_s + ',' + coordinates[:longitude].to_s
+    sale_amount ||= 0
+    coor = [coordinates[:latitude], coordinates[:longitude]].join ','
 
-      uri = URI(service_url + coor + '/get?saleamount=' + sale_amount.to_s)
-      http = Net::HTTP.new(uri.host, uri.port)
-      http.use_ssl = true
-      http.verify_mode = OpenSSL::SSL::VERIFY_NONE
-      http.open_timeout = AVALARA_OPEN_TIMEOUT
-      http.read_timeout = AVALARA_READ_TIMEOUT
+    uri = URI(service_url + coor + '/get?saleamount=' + sale_amount.to_s)
+    http = Net::HTTP.new(uri.host, uri.port)
+    http.use_ssl = true
+    http.verify_mode = OpenSSL::SSL::VERIFY_NONE
+    http.open_timeout = AVALARA_OPEN_TIMEOUT
+    http.read_timeout = AVALARA_READ_TIMEOUT
 
-      res = http.get(uri.request_uri, 'Authorization' => credential, 'Content-Type' => 'application/json')
+    error_callback = proc do |e|
+      logger.error e, 'Estimate Tax Error'
+      'Estimate Tax Error'
+    end
+
+    retry_known_exceptions(retry_opts(error_callback)) do
+      res = http.get(uri.request_uri, 'Authorization' => credential,
+                                      'Content-Type' => 'application/json')
       JSON.parse(res.body)
     end
-  rescue *ERRORS_TO_RETRY => e
-    retry unless (tries -= 1).zero?
-    logger.error e, 'Estimate Tax Error'
-    'Estimate Tax Error'
   end
 
   def ping
@@ -61,20 +64,23 @@ class TaxSvc
   end
 
   def validate_address(address)
-    tries ||= 2
     uri = URI(address_service_url + address.to_query)
     http = Net::HTTP.new(uri.host, uri.port)
     http.use_ssl = true
     http.verify_mode = OpenSSL::SSL::VERIFY_NONE
     http.open_timeout = AVALARA_OPEN_TIMEOUT
     http.read_timeout = AVALARA_READ_TIMEOUT
-    request = http.get(uri.request_uri, 'Authorization' => credential)
-    response = SpreeAvataxCertified::Response::AddressValidation.new(request.body)
-    handle_response(response)
-  rescue *ERRORS_TO_RETRY => e
-    retry unless (tries -= 1).zero?
-    logger.error(e)
-    SpreeAvataxCertified::Response::AddressValidation.new('{}')
+
+    error_callback = proc do |e|
+      logger.error(e)
+      SpreeAvataxCertified::Response::AddressValidation.new('{}')
+    end
+
+    retry_known_exceptions(retry_opts(error_callback)) do
+      request = http.get(uri.request_uri, 'Authorization' => credential)
+      res = SpreeAvataxCertified::Response::AddressValidation.new(request.body)
+      handle_response(res)
+    end
   end
 
   protected
@@ -123,29 +129,37 @@ class TaxSvc
   end
 
   def request(uri, request_hash)
-    tries ||= AVALARA_RETRY
-    res = RestClient::Request.execute(method: :post,
-                                      open_timeout: AVALARA_OPEN_TIMEOUT,
-                                      read_timeout: AVALARA_READ_TIMEOUT,
-                                      url: service_url + uri,
-                                      payload:  JSON.generate(request_hash),
-                                      headers: {
-                                        authorization: credential,
-                                        content_type: 'application/json'
-                                      }) do |response, _request, _result|
-      response
-    end
+    additional_errors = [RestClient::ExceptionWithResponse,
+                         RestClient::ServerBrokeConnection,
+                         RestClient::SSLCertificateNotVerified]
+    error_callback = proc { |e| logger.error e, 'Avalara Request Error' }
 
-    JSON.parse(res)
-  rescue *(ERRORS_TO_RETRY + [RestClient::ExceptionWithResponse,
-                              RestClient::ServerBrokeConnection,
-                              RestClient::SSLCertificateNotVerified]) => e
-    retry unless (tries -= 1).zero?
-    logger.error e, 'Avalara Request Error'
+    retry_known_exceptions(retry_opts(error_callback, additional_errors)) do
+      res = RestClient::Request.execute(method: :post,
+                                        open_timeout: AVALARA_OPEN_TIMEOUT,
+                                        read_timeout: AVALARA_READ_TIMEOUT,
+                                        url: service_url + uri,
+                                        payload:  JSON.generate(request_hash),
+                                        headers: {
+                                          authorization: credential,
+                                          content_type: 'application/json'
+                                        }) do |response, _request, _result|
+        response
+      end
+      JSON.parse(res)
+    end
   end
 
   def log(method, request_hash = nil)
     return if request_hash.nil?
     logger.debug(request_hash, "#{method} request hash")
+  end
+
+  def retry_opts(error_callback = nil, additional_errors = [])
+    {
+      error_callback: error_callback,
+      errors: ERRORS_TO_RETRY + additional_errors,
+      retry_limit: -1
+    }
   end
 end
