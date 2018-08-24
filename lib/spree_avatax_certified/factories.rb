@@ -1,6 +1,3 @@
-FactoryBot.define do
-  factory :use_code, class: Spree::AvalaraEntityUseCode do
-    use_code "A"
-    use_code_description "Federal government"
-  end
+Dir["#{File.dirname(__FILE__)}/../../spec/factories/**"].each do |f|
+  load File.expand_path(f)
 end
