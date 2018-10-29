@@ -1,12 +1,22 @@
 <% origin = JSON.parse(Spree::Config.avatax_origin) || {} %>
-<h1><%= "Avalara Settings" %></h1>
 
-<table class="table table-bordered">
+<% content_for :page_title do %>
+  <%= "Avalara Settings" %>
+<% end %>
+
+<% content_for :page_actions do %>
+  <%= link_to_with_icon 'edit',
+    Spree.t("edit"),
+    edit_admin_avatax_settings_path,
+    class: 'btn btn-success' %>
+<% end %>
+
+<table class="table table-bordered mt-3">
   <tr>
     <th>Connection Status</th>
     <td>
       <%= link_to({controller: :avatax_settings, action: :ping_my_service, remote: true }, {class: 'btn btn-small'}) do %>
-      <button>Test Connection</button> <% end %>
+      <button class="btn btn-primary">Test Connection</button> <% end %>
     </td>
   </tr>
   <tr>
@@ -95,5 +105,3 @@
   </td>
 </tr>
 </table>
-
-<p><%= link_to_with_icon 'edit', Spree.t("edit"), edit_admin_avatax_settings_path %></p>
