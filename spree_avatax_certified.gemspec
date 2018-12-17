@@ -16,7 +16,9 @@ Gem::Specification.new do |s|
   s.require_path = 'lib'
   s.requirements << 'none'
 
-  s.add_runtime_dependency 'spree_core', '>= 3.1.0', '< 4.0'
+  spree_version = '>= 3.2.0', '< 4.0'
+  s.add_runtime_dependency 'spree_core', spree_version
+  s.add_runtime_dependency 'spree_backend', spree_version
   s.add_runtime_dependency 'spree_extension'
   s.add_dependency 'json'
   s.add_dependency 'addressable'
@@ -36,11 +38,12 @@ Gem::Specification.new do |s|
   s.add_development_dependency 'selenium-webdriver'
   s.add_development_dependency 'simplecov'
   s.add_development_dependency 'sqlite3'
-  s.add_development_dependency 'mysql2', '~> 0.3.18'
+  s.add_development_dependency 'mysql2', '~> 0.5.1'
   s.add_development_dependency 'shoulda-matchers'
   s.add_development_dependency 'vcr'
   s.add_development_dependency 'webmock'
   s.add_development_dependency 'pg', '~> 0.18'
   s.add_development_dependency 'appraisal'
   s.add_development_dependency 'puma'
+  s.add_development_dependency 'rails-controller-testing'
 end
