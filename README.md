@@ -3,7 +3,6 @@ SpreeAvataxCertified
 
 
 [![Build Status](https://travis-ci.org/spree-contrib/spree_avatax_certified.svg?branch=master)](https://travis-ci.org/spree-contrib/spree_avatax_certified)
-[![Code Climate](https://codeclimate.com/github/spree-contrib/spree_avatax_certified/badges/gpa.svg)](https://codeclimate.com/github/spree-contrib/spree_avatax_certified)
 
 SpreeAvataxCertified is the *only* [officially certified Avatax solution](http://www.avalara.com/avalara-certified/) that integrates with SpreeCommerce.  With this extension you can add instantaneous sales tax decisions to your store.
 
@@ -58,6 +57,3 @@ Be sure to bundle your dependencies and then create a dummy test app for the spe
     $ bundle exec rspec spec
 
 Copyright (c) 2016 Boomer Digital, released under the New BSD License
-
-# CHANGELOG
-See [CHANGELOG.md](CHANGELOG.md) for change history.
