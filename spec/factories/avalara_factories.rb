@@ -66,10 +66,10 @@ FactoryBot.modify do
 
   # Adding this modifier since US country name changes between solidus versions
   factory :country, class: Spree::Country do
-    iso_name { 'UNITED STATES' }
-    name { 'United States' }
-    iso { 'US' }
-    iso3 { 'USA' }
-    numcode { 840 }
+    sequence(:iso_name) { |n| "ISO_NAME_#{n}" }
+    sequence(:name)     { |n| "NAME_#{n}" }
+    sequence(:iso)      { |n| "I#{n}" }
+    sequence(:iso3)     { |n| "IS#{n}" }
+    numcode             { 840 }
   end
 end
