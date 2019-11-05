@@ -2,17 +2,11 @@ SpreeAvataxCertified
 ===========
 
 
-[![Build Status](https://travis-ci.org/spree-contrib/spree_avatax_certified.svg?branch=master)](https://travis-ci.org/spree-contrib/spree_avatax_certified)
+## ⚠️ Deprecation notice ⚠️
 
-SpreeAvataxCertified is the *only* [officially certified Avatax solution](http://www.avalara.com/avalara-certified/) that integrates with SpreeCommerce.  With this extension you can add instantaneous sales tax decisions to your store.
+This extension is deprecated and won't be maintained anymore. 
 
-From Avalara's own explanation of the certification program:
-
-> Relax. It’s certified.
->
-> Our “Certified for AvaTax” Program features integrations that perform at the highest level, providing the best possible customer experience.
-
-> Avalara’s partners who have created certified integrations for AvaTax have demonstrated that those integrations contain elements which are essential to providing customers with easy-to-use software that gives accurate sales tax calculations. The certification criteria used to demonstrate these elements are based on Avalara’s years of experience integrating into ERP, ecommerce and point-of-sale applications.
+Please migrate to [Spree Avatax Official](https://github.com/spree-contrib/spree_avatax_official) which is a faster, more stable extension which uses Avatax API v2. It's Avatax certified. 
 
 
 Installation
