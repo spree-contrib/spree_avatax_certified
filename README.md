@@ -1,8 +1,4 @@
-SpreeAvataxCertified
-===========
-
-
-## ⚠️ Deprecation notice ⚠️
+# ⚠️ Deprecation notice ⚠️
 
 This extension is deprecated and won't be maintained anymore. 
 
