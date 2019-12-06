@@ -4,6 +4,8 @@ describe SpreeAvataxCertified::Address, :type => :model do
   let(:address){ build(:address) }
   let(:order) { build(:avalara_order, ship_address: address) }
 
+  before { address.country.update(name: 'United States') }
+
   before do
     Spree::Config.avatax_address_validation = true
   end

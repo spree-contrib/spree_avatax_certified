@@ -8,9 +8,9 @@ appraise 'spree-3-3' do
   gem 'spree_backend', '~> 3.3.0'
 end
 
-appraise 'spree-3-6' do
-  gem 'spree_core', '~> 3.6.0'
-  gem 'spree_backend', '~> 3.6.0'
+appraise 'spree-3-7' do
+  gem 'spree_core', '~> 3.7.0'
+  gem 'spree_backend', '~> 3.7.0'
 end
 
 appraise 'spree-master' do

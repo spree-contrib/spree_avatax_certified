@@ -2,6 +2,8 @@ require 'spec_helper'
 
 describe Spree::Address, type: :model do
   let(:address) { build(:address) }
+  before { address.country.update(name: 'United States') }
+
 
   describe '#validation_enabled?' do
     it 'returns true if preference is true and country validation is enabled' do

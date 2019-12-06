@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 describe "VAT", :vcr do
-  let!(:us) { create(:country, iso: 'US', name: 'United States') }
+  let!(:us) { create(:country, iso: 'US', name: 'United States', iso_name: 'UNITED STATES') }
   let!(:it) { create(:country, iso: 'IT', name: 'Italy', iso_name: 'ITALY') }
   let!(:nl) { create(:country, iso: 'NL', name: 'Netherlands', iso_name: 'NETHERLANDS') }
   let!(:fr) { create(:country, iso: 'FR', name: 'France', iso_name: 'FRANCE') }
@@ -151,4 +151,3 @@ describe "VAT", :vcr do
     avalara_order.next!
   end
 end
-
