@@ -24,6 +24,7 @@ Gem::Specification.new do |s|
   s.add_dependency 'addressable'
   s.add_dependency 'rest-client'
   s.add_dependency 'logging'
+  s.add_dependency 'deface', '~> 1.0'
 
   #add gems here for files
   s.add_development_dependency 'dotenv'
